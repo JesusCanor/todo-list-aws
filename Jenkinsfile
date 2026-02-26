@@ -106,7 +106,7 @@ pipeline {
 
                                 git fetch origin
                                 
-                                git checkout -B master
+                                git checkout -B master origin/master
                                 git merge --no-ff -X theirs origin/develop -m "Promote develop to Master"
 
 
