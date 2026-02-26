@@ -1,5 +1,12 @@
 pipeline {
     agent any
+
+    post {
+        always {
+            deleteDir()
+        }
+    }
+
     stages {
         stage('CI') {
             when { expression { env.GIT_BRANCH == 'origin/develop' } }
