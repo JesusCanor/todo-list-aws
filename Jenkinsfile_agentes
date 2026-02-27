@@ -46,6 +46,7 @@ pipeline {
                                 '''
 
                                 archiveArtifacts artifacts: 'flake8.out', fingerprint: true
+                                stash name: 'static-results', includes: 'flake8.out'
                                 deleteDir()
 
                             }
@@ -65,6 +66,7 @@ pipeline {
                                     python3 -m bandit -r ./src -f custom -o bandit.out --msg-template "{abspath}:{line}: [{test_id}] {msg}"
                                 '''
                                 archiveArtifacts artifacts: 'bandit.out', fingerprint: true
+                                stash name: 'security-results', includes: 'bandit.out'
                                 deleteDir()
                             }
                         }
@@ -125,7 +127,8 @@ pipeline {
 
                             pytest -s --junitxml=result-rest.xml test/integration/todoApiTest.py
                         '''
-
+                        
+                        stash name: 'rest-results', includes: 'result-rest.xml'
                         junit 'result-rest.xml'
                         deleteDir()
                     }
