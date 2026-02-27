@@ -12,12 +12,10 @@ pipeline {
                         def configuredBranch = (scm?.branches?.getAt(0)?.name ?: '')
                             .replaceFirst('^\\*/', '')
                             .replaceFirst('^origin/', '')
-                            .replaceFirst('^refs/heads/', '')
                             .trim()
 
                         echo "configuredBranch: ${configuredBranch}"
                         env.PIPELINE_BRANCH = configuredBranch
-                        echo "PIPELINE_BRANCH: ${env.PIPELINE_BRANCH}"
                     }
                 sh 'echo "################# USER=$(whoami) | HOST=$(hostname) | WORKSPACE=$WORKSPACE"'
                 stash name: 'code', includes: '**'
