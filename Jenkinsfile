@@ -183,7 +183,7 @@ pipeline {
                         }
 
                         sh '''
-                            pytest -s --junitxml=result-prod-rest.xml test/integration/todoApiTest.py
+                            pytest -s --junitxml=result-prod-rest.xml -m "readonly" test/integration/todoApiTest.py
                         '''
                         junit 'result-prod-rest.xml'
 
