@@ -33,8 +33,12 @@ pipeline {
 
                     echo $COMMON_BRANCH
 
+                    echo "Bytes iniciales: $(wc -c < samconfig.toml)"
 
-                  curl -fsSL "https://raw.githubusercontent.com/JesusCanor/todo-list-aws-config/${COMMON_BRANCH}/samconfig.toml" | tee samconfig.toml
+                    curl -fsSL "https://raw.githubusercontent.com/JesusCanor/todo-list-aws-config/${COMMON_BRANCH}/samconfig.toml" | tee samconfig.toml
+
+                    echo "Bytes finales: $(wc -c < samconfig.toml)"
+
                 '''
                 stash name: 'code', includes: '**'
 
