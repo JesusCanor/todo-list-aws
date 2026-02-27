@@ -1,34 +1,33 @@
 pipeline {
     agent any
 
+    options { skipDefaultCheckout(true) }
+
     stages {
+
+        stage('Get Code') {
+            steps {
+                    checkout scm
+                    script {
+                        def configuredBranch = (scm?.branches?.getAt(0)?.name ?: '')
+                            .replaceFirst('^\\*/', '')
+                            .replaceFirst('^origin/', '')
+                            .replaceFirst('^refs/heads/', '')
+                            .trim()
+
+                        echo "configuredBranch: ${configuredBranch}"
+                        env.PIPELINE_BRANCH = configuredBranch
+                        echo "PIPELINE_BRANCH: ${env.PIPELINE_BRANCH}"
+                    }
+                sh 'echo "################# USER=$(whoami) | HOST=$(hostname) | WORKSPACE=$WORKSPACE"'
+                stash name: 'code', includes: '**'
+
+                }
+        }
         stage('CI') {
-            when { expression { env.GIT_BRANCH == 'origin/develop' } }
+            when { expression { env.PIPELINE_BRANCH == 'develop' } }
 
             stages {
-
-                stage('Get Code') {
-
-                    options { skipDefaultCheckout(true) }
-
-                    steps {
-//                        withCredentials([usernamePassword(credentialsId: 'CP14',
-//                                  usernameVariable: 'GIT_USER',
-//                                passwordVariable: 'GIT_TOKEN')]) {
-//                          sh '''
-//                              set -eux
-//                              git config user.name "JesusCanor"
-//                              git config user.email "jenkins-cd@local"////                              git remote set-url origin https://${GIT_TOKEN}@github.com/JesusCanor/todo-list-aws.git
-//                              git fetch origin
-//                              git checkout -B CD origin/develop
-//                      '''
-                        checkout scm
-
-                        sh 'echo "################# USER=$(whoami) | HOST=$(hostname) | WORKSPACE=$WORKSPACE"'
-                        stash name: 'code', includes: '**'
-
-                      }
-                }
 
                 stage('Static and Security Tests') {
 
@@ -170,7 +169,7 @@ pipeline {
         }//CI
 
         stage('CD') {
-            when { expression { env.GIT_BRANCH == 'origin/master' } }
+            when { expression { env.PIPELINE_BRANCH == 'master' } }
 
             stages {
                 stage('Get Code') {
@@ -178,8 +177,6 @@ pipeline {
                     options { skipDefaultCheckout(true) }
 
                     steps {
-                        checkout scm
-
                         sh 'echo "################# USER=$(whoami) | HOST=$(hostname) | WORKSPACE=$WORKSPACE"'
                         stash name: 'code', includes: '**'
                       }
