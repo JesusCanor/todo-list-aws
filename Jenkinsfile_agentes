@@ -5,11 +5,6 @@ pipeline {
         timestamps()
     }
 
-    post {
-        always {
-            deleteDir()
-        }
-    }
 
     stages {
         stage('CI') {
@@ -192,8 +187,6 @@ pipeline {
 
                     steps {
 
-                        unstash name: 'code'
-
                         sh '''
                             echo "################# USER=$(whoami) | HOST=$(hostname) | WORKSPACE=$WORKSPACE"
 
@@ -205,6 +198,25 @@ pipeline {
 
                             sam deploy --config-env production --resolve-s3 --no-fail-on-empty-changeset
                         '''
+
+                        script {
+                            env.BASE_URL = sh(
+                                script: '''
+                                    aws cloudformation describe-stacks \
+                                    --stack-name todo-list-aws-staging \
+                                    --region us-east-1 \
+                                    --query "Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue" \
+                                    --output text
+                                ''',
+                                returnStdout: true
+                                ).trim();
+
+                                echo "BASE_URL raw => '${env.BASE_URL}'"
+                    
+                            if (!env.BASE_URL) {
+                                error("Base_URL vacio.")
+                            }
+                        }
                     }
                 } //Stage Deploy
 
@@ -217,17 +229,6 @@ pipeline {
                         unstash name: 'code'
 
                         script {
-                            env.BASE_URL = sh(
-                                script: '''
-                                    aws cloudformation describe-stacks \
-                                    --stack-name todo-list-aws-production \
-                                    --region us-east-1 \
-                                    --query "Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue" \
-                                    --output text
-                                ''',
-                                returnStdout: true
-                            ).trim()
-
                             echo "BASE_URL raw => '${env.BASE_URL}'"
 
                             if (!env.BASE_URL || env.BASE_URL == 'None') {
@@ -242,10 +243,9 @@ pipeline {
                         '''
                         junit 'result-prod-rest.xml'
                         deleteDir()
-
                     }
                 }
-            }//stages CD
-        }//CD
+            }
+        }//stages CD
     }//Stages
 }//pipeline
