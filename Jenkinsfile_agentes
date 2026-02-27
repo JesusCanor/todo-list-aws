@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-
     stages {
         stage('CI') {
             when { expression { env.GIT_BRANCH == 'origin/develop' } }
@@ -9,6 +8,9 @@ pipeline {
             stages {
 
                 stage('Get Code') {
+
+                    options { skipDefaultCheckout(true) }
+
                     steps {
 //                        withCredentials([usernamePassword(credentialsId: 'CP14',
 //                                  usernameVariable: 'GIT_USER',
@@ -29,12 +31,13 @@ pipeline {
                 }
 
                 stage('Static and Security Tests') {
+
+                    options { skipDefaultCheckout(true) }
+
                     parallel {
                         stage('Static') {
 
                             agent { label 'analysis' }
-
-                            options { skipDefaultCheckout(true) }
 
                             steps {
 
@@ -55,8 +58,6 @@ pipeline {
 
                             agent { label 'analysis' }
 
-                            options { skipDefaultCheckout(true) }
-
                             steps {
 
                                 unstash name: 'code'
@@ -74,6 +75,8 @@ pipeline {
                 }//stage static and security
 
                 stage('Deploy') {
+
+                    options { skipDefaultCheckout(true) }
 
                     steps {
                     
@@ -171,6 +174,9 @@ pipeline {
 
             stages {
                 stage('Get Code') {
+
+                    options { skipDefaultCheckout(true) }
+
                     steps {
                         checkout scm
 
@@ -180,6 +186,8 @@ pipeline {
                 }
 
                 stage('Deploy') {
+
+                    options { skipDefaultCheckout(true) }
 
                     steps {
 
