@@ -21,7 +21,7 @@ pipeline {
                     }
 
                 sh '''
-                set -eux
+                    set -eux
                     echo "################# USER=$(whoami) | HOST=$(hostname) | WORKSPACE=$WORKSPACE"
                     REPO_URL="https://github.com/JesusCanor/todo-list-aws-config"
 
@@ -32,6 +32,9 @@ pipeline {
                     fi
 
                     echo $COMMON_BRANCH
+
+
+                  curl -fsSL "https://raw.githubusercontent.com/JesusCanor/todo-list-aws-config/${COMMON_BRANCH}/samconfig.toml" | tee samconfig.toml
                 '''
                 stash name: 'code', includes: '**'
 
