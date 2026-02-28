@@ -165,12 +165,9 @@ pipeline {
 
                                 git remote set-url origin https://${GIT_TOKEN}@github.com/JesusCanor/todo-list-aws.git
 
-                                echo "REMOTE FETCH REFSPEC:"
-                                git config --get-all remote.origin.fetch
-
-                                echo "REMOTE REFS ANTES:"
-                                git show-ref --remotes | head -n 50 || true
-                                git branch -r || true
+                                git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+                                git fetch --prune origin
+                                git branch -r
 
                                 git fetch origin
                                 
