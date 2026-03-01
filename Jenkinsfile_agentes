@@ -183,7 +183,7 @@ pipeline {
                             env.BASE_URL = sh(
                                 script: '''
                                     aws cloudformation describe-stacks \
-                                    --stack-name todo-list-aws-staging \
+                                    --stack-name todo-list-aws-production \
                                     --region us-east-1 \
                                     --query "Stacks[0].Outputs[?OutputKey=='BaseUrlApi'].OutputValue" \
                                     --output text
